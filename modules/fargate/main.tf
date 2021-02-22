@@ -177,7 +177,7 @@ resource "aws_security_group" "public_lb_access" {
 }
 
 resource "aws_lb" "public" {
-  name               = "${var.name}-public-lb"
+  name               = "${var.name}-pub-lb"
   internal           = false
   load_balancer_type = "application"
   idle_timeout       = "30"

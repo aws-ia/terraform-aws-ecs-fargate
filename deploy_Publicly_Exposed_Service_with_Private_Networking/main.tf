@@ -49,7 +49,7 @@ module "bastion" {
 ######################################
 module "fargate" {
   depends_on = [module.quickstart_vpc]
-  source = "../modules/ecs_public_exposed"
+  source = "../modules/fargate"
   region = "us-east-1"
   name   = "${random_pet.name.id}"
 }
