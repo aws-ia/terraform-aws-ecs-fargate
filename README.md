@@ -2,7 +2,7 @@
 
 Authors: David Wright (dwright@hashicorp.com) and Tony Vattahil (tonynv@amazon.com)
 
-This Terraform module deploys a public Amazon Web Services (AWS) Fargate service with private networking on the AWS Cloud. It deploys a VPC with public and private subnets, according to AWS best practices, to provide you with your own virtual network on AWS. The private subnet is used to run your application containers. Containers do not have direct internet access or a public IP address, only a private IP address internal to the VPC. Outbound connections from the containers are routed through a NAT gateway in the public subnet of the VPC. Only the IP address of the NAT gateway is seen by recipients of container requests. A public load balancer accepts inbound connections on specific ports, and forwards acceptable traffic to containers inside the private subnet.
+This Terraform module deploys a public Amazon Web Services (AWS) Fargate service with private networking on the AWS Cloud. It deploys a virtual private cloud (VPC) with public and private subnets, according to AWS best practices, to provide you with your own virtual network on AWS. The private subnet is used to run your application containers. Containers do not have direct internet access or a public IP address, only a private IP address internal to the VPC. Outbound connections from the containers are routed through a NAT gateway in the public subnet of the VPC. Only the IP address of the NAT gateway is seen by recipients of container requests. A public load balancer accepts inbound connections on specific ports, and forwards acceptable traffic to containers inside the private subnet.
 
 To deploy the Terraform Amazon Transit Gateway module, do the following:
 
