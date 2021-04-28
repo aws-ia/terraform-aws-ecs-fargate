@@ -1,4 +1,4 @@
-**Terraform Amazon ECS on AWS Fargate Module**
+**Terraform Amazon ECS on AWS Fargate module**
 
 Authors: David Wright (dwright@hashicorp.com) and Tony Vattahil (tonynv@amazon.com)
 
