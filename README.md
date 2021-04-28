@@ -2,7 +2,7 @@
 
 Authors: David Wright (dwright@hashicorp.com) and Tony Vattahil (tonynv@amazon.com)
 
-This Terraform module deploys Amazon Elastic Container Service (Amazon ECS) on AWS Fargate. It deploys a public facing, privately-networked Fargate service with a private subnet in an Amazon Virtual Private Cloud (VPC) to run your application containers. In this architecture, containers do not have direct internet access or a public IP address, only a private IP address internal to the VPC. Outbound connections from the containers are routed through a NAT gateway in the public subnet of the VPC. Only the IP address of the NAT gateway is seen by recipients of container requests. A public-facing load balancer accepts inbound connections on specific ports, and forwards acceptable traffic to containers inside the private subnet.
+This Terraform module deploys a public Amazon Web Services (AWS) Fargate service with private networking on the AWS Cloud. It deploys a VPC with public and private subnets, according to AWS best practices, to provide you with your own virtual network on AWS. The private subnet is used to run your application containers. Containers do not have direct internet access or a public IP address, only a private IP address internal to the VPC. Outbound connections from the containers are routed through a NAT gateway in the public subnet of the VPC. Only the IP address of the NAT gateway is seen by recipients of container requests. A public load balancer accepts inbound connections on specific ports, and forwards acceptable traffic to containers inside the private subnet.
 
 To deploy the Terraform Amazon Transit Gateway module, do the following:
 
@@ -17,13 +17,13 @@ export TERRAFORM_CONFIG="$HOME/.terraform.d/credentials.tfrc.json"
 
 3. Configure the AWS Command Line Interface (AWS CLI). For more information, see [Configuring the AWS CLI](https://doc.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html).
 4. If you don't have git installed, [install git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git). 
-5. Clone this **aws-quickstart/terraform-aws-transit-gateway** repository using the following command:
+5. Clone this **aws-quickstart/terraform-aws-ecs-fargate** repository using the following command:
 
-   `git clone https://github.com/aws-quickstart/terraform-aws-transit-gateway`
+   `git clone https://github.com/aws-quickstart/terraform-aws-ecs-fargate`
 
 6. Change directory to the root repository directory.
 
-   `cd /terraform-aws-transit-gateway/`
+   `cd /terraform-aws-ecs-fargate/`
 
 7. Change to the deploy directory.
 
