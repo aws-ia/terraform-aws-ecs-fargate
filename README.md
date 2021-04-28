@@ -1,10 +1,10 @@
-**Terraform AWS ECS Fargate Module**
+**Terraform Amazon ECS on AWS Fargate Module**
 
 Authors: David Wright (dwright@hashicorp.com) and Tony Vattahil (tonynv@amazon.com)
 
 This Terraform module deploys Amazon Elastic Container Service (Amazon ECS) on Amazon Web Services (AWS) Fargate. It deploys a virtual private cloud (VPC) with public and private subnets, according to AWS best practices, to provide you with your own virtual network on AWS. Application containers run in the private subnet of the VPC. Containers do not have direct internet access or a public IP address, only a private IP address internal to the VPC. Outbound connections from the private subnet are routed through a NAT gateway in the public subnet of the VPC. Only the IP address of the NAT gateway is seen by recipients of container requests. A public load balancer accepts inbound connections on specific ports, and forwards acceptable traffic to containers inside the private subnet.
 
-To deploy the Terraform Amazon Transit Gateway module, do the following:
+To deploy the Terraform Amazon ECS on AWS Fargate module, do the following:
 
 1. Install Terraform. For instructions and a video tutorial, see [Install Terraform](https://learn.hashicorp.com/tutorials/terraform/install-cli). 
 2. Sign up and log into Terraform Cloud. (There is a free tier available.)
