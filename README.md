@@ -27,13 +27,13 @@ export TERRAFORM_CONFIG="$HOME/.terraform.d/credentials.tfrc.json"
 
 7. Change to the deploy directory.
 
-   - `cd setup_workspace`. 
+   - `cd setup_env`. 
 
 8. To perform operations locally, do the following: 
    
    a. Initialize the deploy directory. Run `terraform init`.  
    b. Start a Terraform run using the configuration files in your deploy directory. Run `terraform apply` or `terraform apply  -var-file="$HOME/.aws/terraform.tfvars"`.
  
-9. Change to the deploy directory with `cd ../deploy`.
+9. Change to the deploy directory with `cd ../deploy_Publicly_Exposed_Service_with_Private_Networking`.
 10. Run `terraform init`.
 11. Run `terraform apply` or `terraform apply  -var-file="$HOME/.aws/terraform.tfvars"`. `Terraform apply` is run remotely in Terraform Cloud.
