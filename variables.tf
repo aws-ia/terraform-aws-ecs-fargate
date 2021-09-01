@@ -41,6 +41,12 @@ variable "container_memory" {
   description = "How much memory in megabytes to give the container"
 }
 
+variable "lb_public_access" {
+  type        = bool
+  default     = true
+  description = "Make LB accessable publicly"
+}
+
 variable "lb_path" {
   type        = string
   default     = "*"
@@ -57,4 +63,9 @@ variable "desired_count" {
   type        = number
   default     = 2
   description = "How many copies of the service task to run"
+}
+variable "cidr_blocks" {
+  type        = list(any)
+  default     = ["10.0.0.0/32"]
+  description = "By default cidr_blocks are locked down. (Update to 0.0.0.0/0 if full public access is needed)"
 }

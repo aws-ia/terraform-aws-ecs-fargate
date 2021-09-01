@@ -68,7 +68,7 @@ resource "aws_security_group" "fargate_container_sg" {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = var.cidr_blocks
 
   }
   ingress {
@@ -90,7 +90,7 @@ resource "aws_security_group" "fargate_container_sg" {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = var.cidr_blocks
   }
 
   tags = {
@@ -124,7 +124,7 @@ resource "aws_ecs_task_definition" "ecs_task" {
         "name" : var.ServiceName
         "portMappings" : [
           {
-            "containerPort" : var.ContainerPort,
+            "containerPort" : var.container_port,
           }
         ]
       }
@@ -149,7 +149,7 @@ resource "aws_ecs_service" "ecs_service" {
   load_balancer {
     target_group_arn = aws_lb_target_group.target_group_public.arn
     container_name   = var.ServiceName
-    container_port   = var.ContainerPort
+    container_port   = var.container_port
   }
 }
 
@@ -165,14 +165,14 @@ resource "aws_security_group" "public_lb_access" {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = var.cidr_blocks
   }
 
   egress {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = var.cidr_blocks
   }
 
   tags = {
@@ -182,7 +182,7 @@ resource "aws_security_group" "public_lb_access" {
 
 resource "aws_lb" "public" {
   name               = "${var.name}-pub-lb"
-  internal           = false
+  internal           = var.lb_public_access
   load_balancer_type = "application"
   idle_timeout       = "30"
   security_groups    = [aws_security_group.public_lb_access.id]
@@ -205,7 +205,7 @@ resource "aws_lb_listener" "public_listener" {
 
 resource "aws_lb_listener_rule" "public" {
   listener_arn = aws_lb_listener.public_listener.arn
-  priority     = var.Priority
+  priority     = var.routing_priority
 
   action {
     type             = "forward"
@@ -214,7 +214,7 @@ resource "aws_lb_listener_rule" "public" {
 
   condition {
     path_pattern {
-      values = [var.Path]
+      values = [var.lb_path]
     }
   }
 }
@@ -238,7 +238,7 @@ resource "aws_security_group" "private_lb_access" {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = var.cidr_blocks
   }
 
   tags = {
@@ -270,7 +270,7 @@ resource "aws_lb_listener" "private_listener" {
 
 resource "aws_lb_listener_rule" "private" {
   listener_arn = aws_lb_listener.private_listener.arn
-  priority     = var.Priority
+  priority     = var.routing_priority
 
   action {
     type             = "forward"
@@ -279,7 +279,7 @@ resource "aws_lb_listener_rule" "private" {
 
   condition {
     path_pattern {
-      values = [var.Path]
+      values = [var.lb_path]
     }
   }
 }
@@ -290,13 +290,13 @@ resource "aws_lb_listener_rule" "private" {
 
 resource "aws_lb_target_group" "target_group_public" {
   name        = "${var.name}-pub-tg"
-  port        = var.ContainerPort
+  port        = var.container_port
   protocol    = "HTTP"
   target_type = "ip"
   health_check {
     path              = "/"
     protocol          = "HTTP"
-    port              = var.ContainerPort
+    port              = var.container_port
     timeout           = "5"
     healthy_threshold = "2"
     interval          = "6"
@@ -307,13 +307,13 @@ resource "aws_lb_target_group" "target_group_public" {
 
 resource "aws_lb_target_group" "target_group_private" {
   name        = "${var.name}-pri-tg"
-  port        = var.ContainerPort
+  port        = var.container_port
   protocol    = "HTTP"
   target_type = "ip"
   health_check {
     path              = "/"
     protocol          = "HTTP"
-    port              = var.ContainerPort
+    port              = var.container_port
     timeout           = "5"
     healthy_threshold = "2"
     interval          = "6"
