@@ -41,4 +41,4 @@ export TERRAFORM_CONFIG="$HOME/AppData/Roaming/terraform.d/credentials.tfrc.json
       - Initialize the deploy directory. Run `terraform init`.
       - Start a Terraform run using the configuration files in your deploy directory. Run `terraform apply`  or `terraform apply -var-file="$HOME/.aws/terraform.tfvars"` (Note: The deployment is remotely run in Terraform Cloud)
    
-   For existing vpc_id directly to the Fargate module.
+   For existing VPC pass `vpc_id` directly to the Fargate module.
