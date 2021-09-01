@@ -16,8 +16,8 @@ variable "account" {
   default     = "test"
 }
 variable "name" {
-  description = "vpc name"
-  default     = "vpc1"
+  description = "ecs vpc"
+  default     = "ecs_fargate"
 }
 variable "delimiter" {
   description = "Delimiter, which could be used between name, namespace and env"
@@ -195,11 +195,6 @@ variable "cidr_blocks" {
   type        = list(any)
   default     = ["10.0.0.0/32"]
   description = "By default cidr_blocks are locked down. (Update to 0.0.0.0/0 if full public access is needed)"
-}
-
-variable "vpc_id" {
-  description = "ECS VPC ID"
-  type        = string
 }
 
 variable "name_prefix" {
