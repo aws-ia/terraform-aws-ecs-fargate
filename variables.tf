@@ -9,7 +9,7 @@ variable "region" {
 variable "name" {
   description = "Name given resources"
   type        = string
-  default     = "aws-quickstart"
+  default     = "aws-ia"
 }
 
 variable "service_name" {
@@ -79,7 +79,7 @@ variable "vpc_id" {
 variable "name_prefix" {
   description = "Name Prefix"
   type        = string
-  default     = "aws-ia"
+  default     = "fw"
 }
 
 variable "network_tag" {
