@@ -1,4 +1,5 @@
 
+
 variable "region" {
   type        = string
   description = "the name of the region you wish to deploy into"
@@ -64,8 +65,25 @@ variable "desired_count" {
   default     = 2
   description = "How many copies of the service task to run"
 }
-variable "cidr_blocks" {
+variable "remote_cidr_blocks" {
   type        = list(any)
   default     = ["10.0.0.0/32"]
   description = "By default cidr_blocks are locked down. (Update to 0.0.0.0/0 if full public access is needed)"
+}
+
+variable "vpc_id" {
+  description = "ECS VPC ID"
+  type        = string
+}
+
+variable "name_prefix" {
+  description = "Name Prefix"
+  type        = string
+  default     = "aws-ia"
+}
+
+variable "network_tag" {
+  description = "Tags used to filter ecs subnets "
+  type        = string
+  default     = "ecs-subnets"
 }

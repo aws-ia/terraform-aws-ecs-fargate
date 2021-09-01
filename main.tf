@@ -2,39 +2,39 @@ terraform {
   required_version = ">= 1.0.0"
 }
 
-######
+###############
 # Collect data
-######
+###############
+
+resource "random_string" "rand4" {
+  length  = 4
+  special = false
+  upper   = false
+}
 
 data "aws_availability_zones" "available" {
   state = "available"
 }
 
-data "aws_vpc" "vpc" {
-  filter {
-    name   = "tag:Name"
-    values = ["${var.name}_vpc"]
-  }
-}
-
 data "aws_subnet_ids" "public" {
-  vpc_id = data.aws_vpc.vpc.id
+  vpc_id = var.vpc_id
   filter {
     name   = "tag:Name"
-    values = ["${var.name}_public_subnets"]
+    values = ["${var.network_tag}_ecs_public_subnet"]
+
   }
 }
 
 data "aws_subnet_ids" "private" {
-  vpc_id = data.aws_vpc.vpc.id
+  vpc_id = var.vpc_id
   filter {
     name   = "tag:Name"
-    values = ["${var.name}_private_subnets_a"]
+    values = ["${var.network_tag}_ecs_private_subnet"]
   }
 }
 
 resource "aws_iam_role" "ECSTaskExecutionRole" {
-  name = var.name
+  name_prefix = var.name_prefix
 
   # Terraform's "jsonencode" function converts a
   # Terraform expression result to valid JSON syntax.
@@ -61,14 +61,14 @@ resource "aws_iam_role" "ECSTaskExecutionRole" {
 # ######
 resource "aws_security_group" "fargate_container_sg" {
   description = "Allow access to the public facing load balancer"
-  vpc_id      = data.aws_vpc.vpc.id
+  vpc_id      = var.vpc_id
 
   ingress {
     description = "Ingress from the public ALB"
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
-    cidr_blocks = var.cidr_blocks
+    cidr_blocks = var.remote_cidr_blocks
 
   }
   ingress {
@@ -90,7 +90,7 @@ resource "aws_security_group" "fargate_container_sg" {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
-    cidr_blocks = var.cidr_blocks
+    cidr_blocks = var.remote_cidr_blocks
   }
 
   tags = {
@@ -102,14 +102,14 @@ resource "aws_security_group" "fargate_container_sg" {
 # ECS
 ######
 
-resource "aws_ecs_cluster" "ecs_Fargate" {
-  name = var.name
+resource "aws_ecs_cluster" "ecs_fargate" {
+  name = "${var.name_prefix}-${random_string.rand4.result}"
 }
 
 resource "aws_ecs_task_definition" "ecs_task" {
-  family                   = var.ServiceName
-  cpu                      = var.ContainerCpu
-  memory                   = var.ContainerMemory
+  family                   = var.service_name
+  cpu                      = var.container_cpu
+  memory                   = var.container_memory
   requires_compatibilities = ["FARGATE"]
   network_mode             = "awsvpc"
   execution_role_arn       = aws_iam_role.ECSTaskExecutionRole.arn
@@ -118,10 +118,10 @@ resource "aws_ecs_task_definition" "ecs_task" {
   container_definitions = jsonencode(
     [
       {
-        "cpu" : var.ContainerCpu,
-        "image" : var.ImageUrl,
-        "memory" : var.ContainerMemory,
-        "name" : var.ServiceName
+        "cpu" : var.container_cpu,
+        "image" : var.image_url,
+        "memory" : var.container_memory,
+        "name" : var.service_name
         "portMappings" : [
           {
             "containerPort" : var.container_port,
@@ -133,12 +133,12 @@ resource "aws_ecs_task_definition" "ecs_task" {
 
 resource "aws_ecs_service" "ecs_service" {
   depends_on                         = [aws_lb.public]
-  name                               = var.name
-  cluster                            = aws_ecs_cluster.ecs_Fargate.id
+  name                               = "${var.name_prefix}-${random_string.rand4.result}"
+  cluster                            = aws_ecs_cluster.ecs_fargate.id
   launch_type                        = "FARGATE"
   deployment_maximum_percent         = "200"
   deployment_minimum_healthy_percent = "75"
-  desired_count                      = var.DesiredCount
+  desired_count                      = var.desired_count
   network_configuration {
     subnets         = data.aws_subnet_ids.private.ids
     security_groups = [aws_security_group.fargate_container_sg.id]
@@ -148,7 +148,7 @@ resource "aws_ecs_service" "ecs_service" {
 
   load_balancer {
     target_group_arn = aws_lb_target_group.target_group_public.arn
-    container_name   = var.ServiceName
+    container_name   = var.service_name
     container_port   = var.container_port
   }
 }
@@ -158,21 +158,21 @@ resource "aws_ecs_service" "ecs_service" {
 ######
 resource "aws_security_group" "public_lb_access" {
   description = "Allow access to the public facing load balancer"
-  vpc_id      = data.aws_vpc.vpc.id
+  vpc_id      = var.vpc_id
 
   ingress {
     description = "allow public access to fargate ECS"
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
-    cidr_blocks = var.cidr_blocks
+    cidr_blocks = var.remote_cidr_blocks
   }
 
   egress {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
-    cidr_blocks = var.cidr_blocks
+    cidr_blocks = var.remote_cidr_blocks
   }
 
   tags = {
@@ -181,7 +181,7 @@ resource "aws_security_group" "public_lb_access" {
 }
 
 resource "aws_lb" "public" {
-  name               = "${var.name}-pub-lb"
+  name_prefix        = var.name_prefix
   internal           = var.lb_public_access
   load_balancer_type = "application"
   idle_timeout       = "30"
@@ -225,7 +225,7 @@ resource "aws_lb_listener_rule" "public" {
 
 resource "aws_security_group" "private_lb_access" {
   description = "Only accept traffic from a container in the fargate container security group"
-  vpc_id      = data.aws_vpc.vpc.id
+  vpc_id      = var.vpc_id
 
   ingress {
     description     = "allow private access to fargate ECS"
@@ -238,7 +238,7 @@ resource "aws_security_group" "private_lb_access" {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
-    cidr_blocks = var.cidr_blocks
+    cidr_blocks = var.remote_cidr_blocks
   }
 
   tags = {
@@ -247,7 +247,7 @@ resource "aws_security_group" "private_lb_access" {
 }
 
 resource "aws_lb" "private" {
-  name               = "${var.name}-pri-lb"
+  name_prefix        = var.name_prefix
   internal           = true
   load_balancer_type = "application"
   idle_timeout       = "30"
@@ -289,7 +289,7 @@ resource "aws_lb_listener_rule" "private" {
 ######
 
 resource "aws_lb_target_group" "target_group_public" {
-  name        = "${var.name}-pub-tg"
+  name_prefix = var.name_prefix
   port        = var.container_port
   protocol    = "HTTP"
   target_type = "ip"
@@ -301,12 +301,12 @@ resource "aws_lb_target_group" "target_group_public" {
     healthy_threshold = "2"
     interval          = "6"
   }
-  vpc_id = data.aws_vpc.vpc.id
+  vpc_id = var.vpc_id
 
 }
 
 resource "aws_lb_target_group" "target_group_private" {
-  name        = "${var.name}-pri-tg"
+  name_prefix = var.name_prefix
   port        = var.container_port
   protocol    = "HTTP"
   target_type = "ip"
@@ -318,6 +318,6 @@ resource "aws_lb_target_group" "target_group_private" {
     healthy_threshold = "2"
     interval          = "6"
   }
-  vpc_id = data.aws_vpc.vpc.id
+  vpc_id = var.vpc_id
 
 }
