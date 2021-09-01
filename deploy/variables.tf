@@ -208,3 +208,9 @@ variable "network_tag" {
   type        = string
   default     = "ecs-subnets"
 }
+
+variable "remote_cidr_blocks" {
+  type        = list(any)
+  default     = ["10.0.0.0/32"]
+  description = "By default cidr_blocks are locked down. (Update to 0.0.0.0/0 if full public access is needed)"
+}
