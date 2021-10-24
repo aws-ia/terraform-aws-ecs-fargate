@@ -45,7 +45,7 @@ variable "container_memory" {
 variable "lb_public_access" {
   type        = bool
   default     = true
-  description = "Make LB accessable publicly"
+  description = "Make LB accessible publicly"
 }
 
 variable "lb_path" {
