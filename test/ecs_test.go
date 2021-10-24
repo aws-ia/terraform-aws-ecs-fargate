@@ -20,7 +20,7 @@ func TestEcsDeploy(t *testing.T) {
 			"region": "eu-west-1"},
 	}
 
-	//defer terraform.Destroy(t, terraformOptions)
+	defer terraform.Destroy(t, terraformOptions)
 	terraform.InitAndApply(t, terraformOptions)
 
 	dns, _ := terraform.OutputE(t, terraformOptions, "public_lb_dns_name")
