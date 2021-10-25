@@ -17,7 +17,8 @@ func TestEcsDeploy(t *testing.T) {
 	terraformOptions := &terraform.Options{
 		TerraformDir: "../deploy",
 		Vars: map[string]interface{}{
-			"region": "eu-west-1"},
+			"region": "eu-west-1",
+		},
 	}
 
 	defer terraform.Destroy(t, terraformOptions)
@@ -27,10 +28,12 @@ func TestEcsDeploy(t *testing.T) {
 
 	var response *http.Response
 	var err error
-	// Sleep and retry if request fails since ECS might need time to start.
-	for i := 0; i < 3; i++ {
+
+	// It takes a while for everything to start up.
+	// So sleep and retry a few times if the request fails.
+	for i := 0; i < 6*3; i++ {
 		response, err = http.Get(fmt.Sprintf("http://%s", dns))
-		if err != nil {
+		if err != nil || response.StatusCode != http.StatusOK {
 			time.Sleep(10 * time.Second)
 		} else {
 			break

@@ -8,10 +8,6 @@ terraform {
 
 provider "aws" {
   region = var.region
-
-  default_tags {
-    tags = module.vpc_label.tags
-  }
 }
 
 resource "random_string" "rand4" {
