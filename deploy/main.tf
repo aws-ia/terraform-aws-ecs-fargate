@@ -3,7 +3,7 @@
 ######################################
 terraform {
   required_version = ">= 1.0.1"
-  #backend "remote" {}
+  backend "remote" {}
 }
 
 provider "aws" {
@@ -61,6 +61,7 @@ module "aws-fargate" {
   vpc_id             = module.fargate_vpc.vpc_id
   region             = var.region
   network_tag        = var.network_tag
+  remote_cidr_blocks = var.remote_cidr_blocks
   service_name       = var.service_name
   image_url          = var.image_url
   container_port     = var.container_port
@@ -70,6 +71,4 @@ module "aws-fargate" {
   lb_path            = var.lb_path
   routing_priority   = var.routing_priority
   desired_count      = var.desired_count
-
-  remote_cidr_blocks = ["0.0.0.0/0"] # Needed to pull Docker image
 }

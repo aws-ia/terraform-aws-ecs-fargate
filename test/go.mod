@@ -3,7 +3,6 @@ module github.com/aws-ia/terraform-aws-ecs-fargate/m/v2
 go 1.17
 
 require (
-	github.com/aws/aws-sdk-go v1.41.9
 	github.com/gruntwork-io/terratest v0.38.2
 	github.com/stretchr/testify v1.7.0
 )
