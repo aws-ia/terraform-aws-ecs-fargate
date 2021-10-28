@@ -182,7 +182,7 @@ resource "aws_security_group" "public_lb_access" {
 
 resource "aws_lb" "public" {
   name_prefix        = var.name_prefix
-  internal           = var.lb_public_access
+  internal           = !var.lb_public_access
   load_balancer_type = "application"
   idle_timeout       = "30"
   security_groups    = [aws_security_group.public_lb_access.id]
@@ -221,7 +221,7 @@ resource "aws_lb_listener_rule" "public" {
 
 ######
 # Set up private load balancer
-###### 
+######
 
 resource "aws_security_group" "private_lb_access" {
   description = "Only accept traffic from a container in the fargate container security group"
@@ -302,7 +302,6 @@ resource "aws_lb_target_group" "target_group_public" {
     interval          = "6"
   }
   vpc_id = var.vpc_id
-
 }
 
 resource "aws_lb_target_group" "target_group_private" {
@@ -319,5 +318,4 @@ resource "aws_lb_target_group" "target_group_private" {
     interval          = "6"
   }
   vpc_id = var.vpc_id
-
 }

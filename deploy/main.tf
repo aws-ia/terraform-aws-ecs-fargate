@@ -53,6 +53,8 @@ module "fargate_vpc" {
 }
 
 module "aws-fargate" {
+  depends_on = [module.fargate_vpc]
+
   source             = "../"
   name               = var.name
   name_prefix        = var.name_prefix

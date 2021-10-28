@@ -4,7 +4,7 @@ variable "region" {
   default     = "us-west-2"
 }
 variable "namespace" {
-  description = "Namespace, which could be your organiation name, e.g. amazon"
+  description = "Namespace, which could be your organization name, e.g. Amazon"
   default     = "myorg"
 }
 variable "env" {
@@ -188,7 +188,7 @@ variable "routing_priority" {
 
 variable "desired_count" {
   type        = number
-  default     = 2
+  default     = 1
   description = "How many copies of the service task to run"
 }
 variable "cidr_blocks" {
