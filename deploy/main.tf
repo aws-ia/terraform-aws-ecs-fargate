@@ -71,4 +71,5 @@ module "aws-fargate" {
   lb_path            = var.lb_path
   routing_priority   = var.routing_priority
   desired_count      = var.desired_count
+  enable_ecs_exec    = var.enable_ecs_exec
 }

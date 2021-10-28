@@ -43,3 +43,16 @@ export TERRAFORM_CONFIG="$HOME/AppData/Roaming/terraform.d/credentials.tfrc.json
       - Start a Terraform run using the configuration files in your deploy directory. Run `terraform apply`  or `terraform apply -var-file="$HOME/.aws/terraform.tfvars"` (Note: The deployment is remotely run in Terraform Cloud)
    
    For existing VPC pass `vpc_id` directly to the Fargate module.
+
+## Amazon ECS Exec 
+This module supports [Amazon ECS Exec](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs-exec.html). It can be enabled by setting the `enable_ecs_exec` variable to true.
+
+You can exec to the running container by running the following command:
+```shell
+aws ecs execute-command --cluster cluster-name \
+    --task task-id \
+    --container container-name \
+    --interactive \
+    --command "/bin/sh"
+    --profile your-profile
+```

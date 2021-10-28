@@ -16,9 +16,6 @@ func TestEcsDeploy(t *testing.T) {
 
 	terraformOptions := &terraform.Options{
 		TerraformDir: "../deploy",
-		Vars: map[string]interface{}{
-			"region": "eu-west-1",
-		},
 	}
 
 	defer terraform.Destroy(t, terraformOptions)

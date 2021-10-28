@@ -146,8 +146,14 @@ variable "service_name" {
 
 variable "image_url" {
   type        = string
-  default     = "nginx"
+  default     = "nginx:stable-alpine"
   description = "the url of a docker image that contains the application process that will handle the traffic for this service"
+}
+
+variable "enable_ecs_exec" {
+  type        = bool
+  default     = false
+  description = "Enables ECS exec"
 }
 
 variable "container_port" {

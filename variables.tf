@@ -42,6 +42,12 @@ variable "container_memory" {
   description = "How much memory in megabytes to give the container"
 }
 
+variable "enable_ecs_exec" {
+  type        = bool
+  default     = false
+  description = "Enables ECS exec"
+}
+
 variable "lb_public_access" {
   type        = bool
   default     = true

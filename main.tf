@@ -32,28 +32,57 @@ data "aws_subnet_ids" "private" {
     values = ["${var.network_tag}_ecs_private_subnet"]
   }
 }
-
+#######
+# IAM
+#######
 resource "aws_iam_role" "ECSTaskExecutionRole" {
   name_prefix = var.name_prefix
 
-  # Terraform's "jsonencode" function converts a
-  # Terraform expression result to valid JSON syntax.
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Action = "sts:AssumeRole"
-        Effect = "Allow"
-        Principal = {
-          Service = "ecs-tasks.amazonaws.com"
-        }
-      },
-    ]
-  })
+  assume_role_policy = data.aws_iam_policy_document.allow_assume_ecs_task.json
 
   tags = {
     Environment = "aws-ia-fargate"
   }
+}
+
+resource "aws_iam_role" "task_role" {
+  name_prefix = var.name_prefix
+
+  assume_role_policy = data.aws_iam_policy_document.allow_assume_ecs_task.json
+  tags = {
+    Environment = "aws-ia-fargate"
+  }
+}
+
+data "aws_iam_policy_document" "allow_assume_ecs_task" {
+  statement {
+    actions = ["sts:AssumeRole"]
+    principals {
+      identifiers = ["ecs-tasks.amazonaws.com"]
+      type        = "Service"
+    }
+  }
+}
+
+data "aws_iam_policy_document" "allow-ecs-exec" {
+  version = "2012-10-17"
+  statement {
+    effect = "Allow"
+    actions = [
+      "ssmmessages:CreateControlChannel",
+      "ssmmessages:CreateDataChannel",
+      "ssmmessages:OpenControlChannel",
+      "ssmmessages:OpenDataChannel"
+    ]
+    resources = ["*"]
+  }
+}
+
+resource "aws_iam_role_policy" "task_role_policy_restapi" {
+  count = var.enable_ecs_exec ? 1 : 0
+
+  role        = aws_iam_role.task_role.id
+  policy = data.aws_iam_policy_document.allow-ecs-exec.json
 }
 
 # ######
@@ -113,7 +142,7 @@ resource "aws_ecs_task_definition" "ecs_task" {
   requires_compatibilities = ["FARGATE"]
   network_mode             = "awsvpc"
   execution_role_arn       = aws_iam_role.ECSTaskExecutionRole.arn
-
+  task_role_arn            = aws_iam_role.task_role.arn
 
   container_definitions = jsonencode(
     [
@@ -121,12 +150,15 @@ resource "aws_ecs_task_definition" "ecs_task" {
         "cpu" : var.container_cpu,
         "image" : var.image_url,
         "memory" : var.container_memory,
-        "name" : var.service_name
+        "name" : var.service_name,
         "portMappings" : [
           {
             "containerPort" : var.container_port,
           }
-        ]
+        ],
+        "linuxParameters" : {
+          "initProcessEnabled": var.enable_ecs_exec
+        }
       }
   ])
 }
@@ -139,6 +171,9 @@ resource "aws_ecs_service" "ecs_service" {
   deployment_maximum_percent         = "200"
   deployment_minimum_healthy_percent = "75"
   desired_count                      = var.desired_count
+
+  enable_execute_command = var.enable_ecs_exec
+
   network_configuration {
     subnets         = data.aws_subnet_ids.private.ids
     security_groups = [aws_security_group.fargate_container_sg.id]
