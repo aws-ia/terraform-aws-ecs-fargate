@@ -1,6 +1,6 @@
 module github.com/aws-ia/terraform-aws-ecs-fargate/m/v2
 
-go 1.17
+go 1.24.0
 
 require (
 	github.com/gruntwork-io/terratest v0.38.2
@@ -21,9 +21,9 @@ require (
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/tmccombs/hcl2json v0.3.3 // indirect
 	github.com/zclconf/go-cty v1.8.1 // indirect
-	golang.org/x/crypto v0.31.0 // indirect
-	golang.org/x/net v0.33.0 // indirect
-	golang.org/x/sys v0.28.0 // indirect
-	golang.org/x/text v0.21.0 // indirect
+	golang.org/x/crypto v0.45.0 // indirect
+	golang.org/x/net v0.47.0 // indirect
+	golang.org/x/sys v0.38.0 // indirect
+	golang.org/x/text v0.31.0 // indirect
 	gopkg.in/yaml.v3 v3.0.0 // indirect
 )
